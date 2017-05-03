@@ -34,6 +34,7 @@ export class RecipeEditComponent implements OnInit {
     } else {
       this.recipeService.addRecipe(this.recipeForm.value);
     }
+    this.recipeService.changesMade = true;
     this.router.navigate(['/recipes', this.id]);
   }
 
@@ -48,10 +49,12 @@ export class RecipeEditComponent implements OnInit {
         'amount': new FormControl(null, [Validators.required, Validators.pattern(/^[1-9]+[0-9]*$/)]),
       })
     );
+    this.recipeService.changesMade = true;
   }
 
   onDeleteIngredient(index: number) {
     (<FormArray>this.recipeForm.get('ingredients')).removeAt(index);
+    this.recipeService.changesMade = true;
   }
 
   private initForm() {

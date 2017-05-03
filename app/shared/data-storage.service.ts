@@ -14,15 +14,18 @@ export class DataStorageService {
 
   storeRecipes() {
     const token = this.authService.getToken();
+    this.recipeService.changesMade = false;
     
     return this.http.put('https://ng-recipe-book-cf050.firebaseio.com/recipes.json?auth=' + token, 
-                          this.recipeService.getRecipes());
+                          this.recipeService.getRecipes())
+                          .catch(this.handlePutError);
   }
 
   fetchRecipes() {
-    const token = this.authService.getToken();
+    // const token = this.authService.getToken();
     
-    this.http.get('https://ng-recipe-book-cf050.firebaseio.com/recipes.json?auth=' + token)
+    // this.http.get('https://ng-recipe-book-cf050.firebaseio.com/recipes.json?auth=' + token)
+    this.http.get('https://ng-recipe-book-cf050.firebaseio.com/recipes.json')
               .map(
                 (response: Response) => {
                   const recipes: Recipe[] = response.json();
@@ -39,5 +42,12 @@ export class DataStorageService {
                   this.recipeService.updateRecipes(recipes);
                 }
               );
+    this.recipeService.changesMade = false;
+  }
+
+  private handlePutError(error: any): Promise<any> {
+    console.error('An error occurred saving to database.', error); // for demo purposes only
+    this.recipeService.changesMade = true;
+    return Promise.reject(error.message || error);
   }
 }
